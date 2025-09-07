@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://btx78swmaotqb"]
+
+[ext_resource type="Script" uid="uid://ca2bdi5mh2bkk" path="res://scenes/spike/Spike.cs" id="1_1xk1p"]
+[ext_resource type="Texture2D" uid="uid://buycodfdxqrom" path="res://sprites/puzzle_game_gfx/Sweeper/sweeper_mine.png" id="1_l5oik"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1xk1p"]
+size = Vector2(28, 28)
+
+[node name="Spike" type="Area2D"]
+script = ExtResource("1_1xk1p")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.063, 0.063)
+texture = ExtResource("1_l5oik")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(16, 16)
+shape = SubResource("RectangleShape2D_1xk1p")

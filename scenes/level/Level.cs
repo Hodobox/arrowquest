@@ -90,6 +90,14 @@ public partial class Level : Node
 		}
 	}
 
+	private void SomethingSteppedOnSpike(Node2D body) {
+		Player p = body as Player;
+
+		if(p != null) {
+			p.alive = false;
+		}
+	}
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -100,6 +108,12 @@ public partial class Level : Node
 			Player p = player as Player;
 			if(p != null) {
 				players.Add(p);
+			}
+		} 
+		foreach(Node spike in tiles.GetChildren()) {
+			Spike s = spike as Spike;
+			if(s != null) {
+				s.BodyEntered += SomethingSteppedOnSpike;
 			}
 		}
 	}
@@ -126,7 +140,7 @@ public partial class Level : Node
 		this.SaveState();
 
 		Direction direction = maybe_direction.Value;
-		foreach(Player p in players) {
+		foreach(Player p in players.Where(p => p.alive)) {
 			p.Move(direction);
 		}
 

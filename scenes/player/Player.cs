@@ -35,7 +35,12 @@ public partial class Player : CharacterBody2D
 	
 	public override void _PhysicsProcess(double delta)
 	{
-		
+		if(!this.alive) {
+			this.Hide();
+		}
+		else {
+			this.Show();
+		}
 	}
 
 	public void Move(Direction dir) {
