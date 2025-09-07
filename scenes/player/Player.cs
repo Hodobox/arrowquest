@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public partial class Player : CharacterBody2D
 {
+	public bool alive = true;
 	private struct State {
 		public Vector2 position;
 		public bool alive;
@@ -12,7 +14,8 @@ public partial class Player : CharacterBody2D
 			this.alive = alive;
 		}
 	}
-	public bool alive = true;
+	private Stack<State> states = new Stack<State>();
+	
 	private State GenerateState() {
 		return new State(GlobalPosition, this.alive);
 	}
@@ -24,12 +27,12 @@ public partial class Player : CharacterBody2D
 		this.states.Push(this.GenerateState());
 	}
 	public void Undo() {
-		if(this.states.Count > 0) {
+		if(this.states.Any()) {
 			this.ApplyState(this.states.Pop());
 		}
 	}
 
-	private Stack<State> states = new Stack<State>();
+	
 	public override void _PhysicsProcess(double delta)
 	{
 		
