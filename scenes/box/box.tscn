@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://ht5dml6fa6tq"]
+
+[ext_resource type="Texture2D" uid="uid://cmq6tworowgqd" path="res://sprites/puzzle_game_gfx/Blocks/block_1_white.png" id="1_dry3k"]
+[ext_resource type="Script" uid="uid://c0h6yhetpkirp" path="res://scenes/box/Box.cs" id="1_vf6jd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vf6jd"]
+size = Vector2(30, 30)
+
+[node name="Box" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_vf6jd")
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(16, 16)
+scale = Vector2(0.063, 0.063)
+texture = ExtResource("1_dry3k")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(16, 16)
+shape = SubResource("RectangleShape2D_vf6jd")

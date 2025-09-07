@@ -1,0 +1,21 @@
+[gd_scene load_steps=7 format=3 uid="uid://dfvmcdvdqrpvp"]
+
+[ext_resource type="Script" uid="uid://dc3pdd4ybsqpi" path="res://scenes/level/Level.cs" id="1_i166f"]
+[ext_resource type="PackedScene" uid="uid://cvk16e7bi0m0k" path="res://scenes/player/player.tscn" id="1_nbgty"]
+[ext_resource type="PackedScene" uid="uid://ht5dml6fa6tq" path="res://scenes/box/box.tscn" id="2_i166f"]
+[ext_resource type="Script" uid="uid://kih7g51kac8f" path="res://scenes/level/Tiles.cs" id="4_qkmgm"]
+
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_qkmgm"]
+scenes/1/scene = ExtResource("1_nbgty")
+scenes/2/scene = ExtResource("2_i166f")
+
+[sub_resource type="TileSet" id="TileSet_hnne4"]
+sources/3 = SubResource("TileSetScenesCollectionSource_qkmgm")
+
+[node name="Level" type="Node"]
+script = ExtResource("1_i166f")
+
+[node name="Tiles" type="TileMapLayer" parent="."]
+tile_map_data = PackedByteArray(0, 0, 2, 0, 2, 0, 3, 0, 0, 0, 0, 0, 1, 0)
+tile_set = SubResource("TileSet_hnne4")
+script = ExtResource("4_qkmgm")
