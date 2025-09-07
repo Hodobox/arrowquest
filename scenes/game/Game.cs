@@ -3,12 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public partial class Level : Node
+public partial class Game : Node
 {
+	public int current_level;
+	Godot.Collections.Array<BaseLevel> levels = [];
+
+	// Per-level stuff
 	Godot.Collections.Array<Player> players = [];
-	int arrow_index = 0;
-	[Export]
-	public string ARROWS { get; set; } = "*";
+	public int arrow_index = 0;
+	public string arrows;
+	
 
 	private struct State{
 		public int arrow_index;
@@ -39,11 +43,45 @@ public partial class Level : Node
 		this.states.Push(this.GenerateState());
 	}
 
+	private string GetLevelName(int level) {
+		return $"Level{level:D2}";
+	}
+
+	private void LoadLevel(int num_level) {
+		
+		string level_name = GetLevelName(num_level);
+		this.current_level = num_level;
+		this.states = new Stack<State>();
+
+		foreach(BaseLevel level in this.levels) {
+			if(level.Name != level_name) {
+				level.Hide();
+				continue;
+			}
+			level.Show();
+			this.arrow_index = 0;
+			this.arrows = level.arrows;
+
+			foreach(Node player in level.GetChildren()) {
+				Player p = player as Player;
+				if(p != null) {
+					players.Add(p);
+				}
+			} 
+			foreach(Node spike in level.GetChildren()) {
+				Spike s = spike as Spike;
+				if(s != null) {
+					s.BodyEntered += SomethingSteppedOnSpike;
+				}
+			}
+		}
+	}
+
 	private bool AnyoneAlive() {
 		return players.Where(p => p.alive).Any();
 	}
 	public bool Won() {
-		return this.arrow_index == this.ARROWS.Length;
+		return this.arrow_index == this.arrows.Length;
 	}
 
 	private bool DirMatchesArrow(Direction dir, char arrow) {
@@ -66,11 +104,11 @@ public partial class Level : Node
 		}
 		
 		display.Text = "";
-		for(int i=0;i<this.ARROWS.Length;++i) {
+		for(int i=0;i<this.arrows.Length;++i) {
 			if(i == this.arrow_index) {
 				display.AppendText(new string(['[']));
 			}
-			display.AppendText(new string([this.ARROWS[i]]));
+			display.AppendText(new string([this.arrows[i]]));
 			if(i == this.arrow_index) {
 				display.AppendText(new string([']']));
 			}
@@ -78,15 +116,15 @@ public partial class Level : Node
 	}
 
 	private void ApplyMoveToArrows(Direction dir) {
-		if(this.arrow_index == this.ARROWS.Length) return;
+		if(this.arrow_index == this.arrows.Length) return;
 
-		char next_arrow = this.ARROWS[this.arrow_index];
+		char next_arrow = this.arrows[this.arrow_index];
 
 		if(this.DirMatchesArrow(dir, next_arrow)) {
 			this.arrow_index += 1;
 		}
 		else {
-			this.arrow_index = this.DirMatchesArrow(dir, this.ARROWS[0]) ? 1 : 0;
+			this.arrow_index = this.DirMatchesArrow(dir, this.arrows[0]) ? 1 : 0;
 		}
 	}
 
@@ -101,26 +139,29 @@ public partial class Level : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		
-		TileMapLayer tiles = this.FindChild("Tiles") as TileMapLayer;
-		
-		foreach(Node player in tiles.GetChildren()) {
-			Player p = player as Player;
-			if(p != null) {
-				players.Add(p);
+
+		for(int i=1;i<=99;++i) {
+			string level_name = GetLevelName(i);
+			BaseLevel level = this.FindChild(level_name, false) as BaseLevel;
+			if(level == null) {
+				break;
 			}
-		} 
-		foreach(Node spike in tiles.GetChildren()) {
-			Spike s = spike as Spike;
-			if(s != null) {
-				s.BodyEntered += SomethingSteppedOnSpike;
-			}
+
+			this.levels.Add(level);
 		}
+
+		this.LoadLevel(1);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _PhysicsProcess(double delta)
 	{
+
+		if(this.Won() && current_level < this.levels.Count) {
+			this.LoadLevel(current_level+1);
+			return;
+		}
+
 		this.DisplayArrows();
 
 		Direction? maybe_direction = this.GetInputDirection();

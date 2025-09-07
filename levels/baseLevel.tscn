@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cjayent1jpbm7"]
+
+[ext_resource type="TileSet" uid="uid://cwp0r83guviiq" path="res://levels/baseLevel.tres" id="1_5r6xm"]
+[ext_resource type="Script" uid="uid://b5e401418s24k" path="res://levels/BaseLevel.cs" id="2_ee0x0"]
+
+[node name="BaseLevel" type="TileMapLayer"]
+tile_set = ExtResource("1_5r6xm")
+script = ExtResource("2_ee0x0")
+arrows = "RR*"

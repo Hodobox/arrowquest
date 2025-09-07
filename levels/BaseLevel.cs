@@ -1,8 +1,10 @@
 using Godot;
-using System;
 
-public partial class Tiles : TileMapLayer
+public partial class BaseLevel : TileMapLayer
 {
+	[Export]
+	public string arrows { get; set; }
+	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
