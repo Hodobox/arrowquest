@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public partial class Player : CharacterBody2D
+public partial class Player : CharacterBody2D, IUndoable
 {
 	public bool alive = true;
 	private struct State {
@@ -14,7 +14,7 @@ public partial class Player : CharacterBody2D
 			this.alive = alive;
 		}
 	}
-	private Stack<State> states = new Stack<State>();
+	private List<State> states = new List<State>();
 	
 	private State GenerateState() {
 		return new State(GlobalPosition, this.alive);
@@ -24,11 +24,17 @@ public partial class Player : CharacterBody2D
 		this.alive = s.alive;
 	}
 	public void SaveState() {
-		this.states.Push(this.GenerateState());
+		this.states.Add(this.GenerateState());
 	}
 	public void Undo() {
 		if(this.states.Any()) {
-			this.ApplyState(this.states.Pop());
+			this.ApplyState(this.states[this.states.Count-1]);
+			this.states.RemoveAt(this.states.Count-1);
+		}
+	}
+	public void ApplyInitialState() {
+		if(this.states.Any()) {
+			this.ApplyState(this.states[0]);
 		}
 	}
 

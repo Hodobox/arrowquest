@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public partial class Game : Node
+public partial class Game : Node, IUndoable
 {
 	Godot.Collections.Array<string> level_names = ["basic", "basic_and_wildcard", "wildcard_shuffle", "tight_shuffle", "hard_wall"];
 	public int current_level_index = 0;
@@ -23,33 +23,43 @@ public partial class Game : Node
 			this.arrow_index = arrow_index;
 		}
 	}
-	private Stack<State> states = new Stack<State>();
+	private List<State> states = new List<State>();
 	private State GenerateState() {
 		return new State(this.arrow_index);
 	}
 	private void ApplyState(State s) {
 		this.arrow_index = s.arrow_index;
 	}
+	public void SaveState() {
+		foreach(Player p in this.players) {
+			p.SaveState();
+		}
+		this.states.Add(this.GenerateState());
+	}
+	public void ApplyInitialState() {
+		foreach(Player p in this.players) {
+			p.ApplyInitialState();
+		}
+		if(this.states.Any()) {
+			this.ApplyState(this.states[0]);
+		}
+	}
 	public void Undo() {
 		foreach(Player p in this.players) {
 			p.Undo();
 		}
 		if(this.states.Any()) {
-			this.ApplyState(this.states.Pop());
+			this.ApplyState(this.states[this.states.Count-1]);
+			this.states.RemoveAt(this.states.Count-1);
 		}
 	}
-	public void SaveState() {
-		foreach(Player p in this.players) {
-			p.SaveState();
-		}
-		this.states.Push(this.GenerateState());
-	}
+	
 
 	private void LoadLevel(int num_level) {
 		
 		string level_name = level_names[num_level];
 		this.current_level_index = num_level;
-		this.states = new Stack<State>();
+		this.states = new List<State>();
 
 		level?.QueueFree();
 
