@@ -5,15 +5,17 @@ using System.Linq;
 
 public partial class Game : Node
 {
+	// TODO: change the mechanism to use real names and an order, not this name-with-number
 	public int current_level;
 	Godot.Collections.Array<BaseLevel> levels = [];
 
 	// Per-level stuff
 	Godot.Collections.Array<Player> players = [];
+	// TODO: just get a grid position or something
+	Godot.Collections.Array<Wall> walls = [];
 	public int arrow_index = 0;
 	public string arrows;
 	
-
 	private struct State{
 		public int arrow_index;
 
@@ -56,22 +58,39 @@ public partial class Game : Node
 		foreach(BaseLevel level in this.levels) {
 			if(level.Name != level_name) {
 				level.Hide();
+
+				foreach(Node spike in level.GetChildren()) {
+					Spike s = spike as Spike;
+					if(s != null) {
+						s.Disable(true);
+					} 
+				}
 				continue;
 			}
+
 			level.Show();
 			this.arrow_index = 0;
 			this.arrows = level.arrows;
-
+			
+			this.players = [];
 			foreach(Node player in level.GetChildren()) {
 				Player p = player as Player;
 				if(p != null) {
 					players.Add(p);
 				}
-			} 
+			}
 			foreach(Node spike in level.GetChildren()) {
 				Spike s = spike as Spike;
 				if(s != null) {
 					s.BodyEntered += SomethingSteppedOnSpike;
+					s.Disable(false);
+				}
+			}
+			this.walls = [];
+			foreach(Node wall in level.GetChildren()) {
+				Wall w = wall as Wall;
+				if(w != null) {
+					walls.Add(w);
 				}
 			}
 		}
@@ -182,6 +201,9 @@ public partial class Game : Node
 
 		Direction direction = maybe_direction.Value;
 		foreach(Player p in players.Where(p => p.alive)) {
+			Vector2 p_destination = p.WouldTryToMoveTo(direction);
+			if(walls.Where(w => w.GlobalPosition == p_destination).Any()) continue;
+
 			p.Move(direction);
 		}
 

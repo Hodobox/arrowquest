@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://siclooeh6nb4"]
+
+[ext_resource type="Texture2D" uid="uid://dkpxr26t4i4is" path="res://sprites/puzzlepack/PNG/Tiles orange/tileOrange_72.png" id="1_t8knd"]
+[ext_resource type="Script" uid="uid://bbaaqdnkipn1x" path="res://scenes/wall/Wall.cs" id="1_toau8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_toau8"]
+size = Vector2(30, 30)
+
+[node name="Wall" type="StaticBody2D"]
+script = ExtResource("1_toau8")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("1_t8knd")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(16, 16)
+shape = SubResource("RectangleShape2D_toau8")

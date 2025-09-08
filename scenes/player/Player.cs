@@ -43,6 +43,11 @@ public partial class Player : CharacterBody2D
 		}
 	}
 
+	public Vector2 WouldTryToMoveTo(Direction dir) {
+		Vector2 velocity = MoveUtils.GetVelocityFromDirection(dir);
+		return GlobalPosition + velocity * Constants.TILE_SIZE;
+	}
+
 	public void Move(Direction dir) {
 		Vector2 velocity = MoveUtils.GetVelocityFromDirection(dir); 
 		this._Move(velocity);
@@ -51,7 +56,5 @@ public partial class Player : CharacterBody2D
 	public void _Move(Vector2 velocity) {
 		GlobalPosition += velocity * Constants.TILE_SIZE;
 	}
-
-	
 
 }
