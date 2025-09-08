@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,36 +9,32 @@ public partial class Game : Node, IUndoable
 	BaseLevel level = null;
 
 	// Per-level stuff
+	Arrows arrows;
 	Godot.Collections.Array<Player> players = [];
 	// TODO: just get a grid position or something
 	Godot.Collections.Array<Wall> walls = [];
-	public int arrow_index = 0;
-	public string arrows;
+	
 	
 	private struct State{
-		public int arrow_index;
-
-		public State(int arrow_index) {
-			this.arrow_index = arrow_index;
-		}
+		public State() {}
 	}
 	private List<State> states = new List<State>();
 	private State GenerateState() {
-		return new State(this.arrow_index);
+		return new State();
 	}
-	private void ApplyState(State s) {
-		this.arrow_index = s.arrow_index;
-	}
+	private void ApplyState(State s) {}
 	public void SaveState() {
 		foreach(Player p in this.players) {
 			p.SaveState();
 		}
+		this.arrows.SaveState();
 		this.states.Add(this.GenerateState());
 	}
 	public void ApplyInitialState() {
 		foreach(Player p in this.players) {
 			p.ApplyInitialState();
 		}
+		this.arrows.ApplyInitialState();
 		if(this.states.Any()) {
 			this.ApplyState(this.states[0]);
 		}
@@ -48,6 +43,7 @@ public partial class Game : Node, IUndoable
 		foreach(Player p in this.players) {
 			p.Undo();
 		}
+		this.arrows.Undo();
 		if(this.states.Any()) {
 			this.ApplyState(this.states[this.states.Count-1]);
 			this.states.RemoveAt(this.states.Count-1);
@@ -67,8 +63,7 @@ public partial class Game : Node, IUndoable
 		level = requested_level_scene.Instantiate() as BaseLevel;
 		this.AddChild(level);
 			
-		this.arrow_index = 0;
-		this.arrows = level.arrows;
+		this.arrows = new Arrows(level.arrows);
 			
 		this.players = [];
 		foreach(Node player in level.GetChildren()) {
@@ -97,19 +92,10 @@ public partial class Game : Node, IUndoable
 		return players.Where(p => p.alive).Any();
 	}
 	public bool Won() {
-		return this.arrow_index == this.arrows.Length;
+		return this.arrows.Completed();
 	}
 
-	private bool DirMatchesArrow(Direction dir, char arrow) {
-		// TODO: this needs an enum or something.
-		if(arrow == '*') return true;
-		if(arrow == 'U') return dir == Direction.UP;
-		if(arrow == 'R') return dir == Direction.RIGHT;
-		if(arrow == 'D') return dir == Direction.DOWN;
-		if(arrow == 'L') return dir == Direction.LEFT;
-		GD.PrintErr($"Invalid arrow character in level: '{arrow}'");
-		return false;
-	}
+	
 
 	private void DisplayArrows() {
 		RichTextLabel display = this.FindChild("ArrowDisplay") as RichTextLabel;
@@ -120,29 +106,18 @@ public partial class Game : Node, IUndoable
 		}
 		
 		display.Text = "";
-		for(int i=0;i<this.arrows.Length;++i) {
-			if(i == this.arrow_index) {
+		for(int i=0;i<this.arrows.num_arrows;++i) {
+			if(i == this.arrows.next_arrow_index) {
 				display.AppendText(new string(['[']));
 			}
-			display.AppendText(new string([this.arrows[i]]));
-			if(i == this.arrow_index) {
+			display.AppendText(new string([this.arrows.arrows[i]]));
+			if(i == this.arrows.next_arrow_index) {
 				display.AppendText(new string([']']));
 			}
 		}
 	}
 
-	private void ApplyMoveToArrows(Direction dir) {
-		if(this.arrow_index == this.arrows.Length) return;
-
-		char next_arrow = this.arrows[this.arrow_index];
-
-		if(this.DirMatchesArrow(dir, next_arrow)) {
-			this.arrow_index += 1;
-		}
-		else {
-			this.arrow_index = this.DirMatchesArrow(dir, this.arrows[0]) ? 1 : 0;
-		}
-	}
+	
 
 	private void SomethingSteppedOnSpike(Node2D body) {
 		Player p = body as Player;
@@ -171,10 +146,17 @@ public partial class Game : Node, IUndoable
 
 		Direction? maybe_direction = this.GetInputDirection();
 		bool undo = Input.IsActionJustPressed("undo");
-		if(undo == false && maybe_direction == null) return;
+		bool restart = Input.IsActionJustPressed("restart");
+		if(undo == false && restart == false && maybe_direction == null) return;
 
 		if(undo) {
 			this.Undo();
+			return;
+		}
+
+		if(restart) {
+			this.SaveState();
+			this.ApplyInitialState();
 			return;
 		}
 
@@ -193,7 +175,7 @@ public partial class Game : Node, IUndoable
 			p.Move(direction);
 		}
 
-		this.ApplyMoveToArrows(direction);
+		this.arrows.ApplyMoveToArrows(direction);
 	}
 
 
