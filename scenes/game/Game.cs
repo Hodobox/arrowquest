@@ -5,9 +5,9 @@ using System.Linq;
 
 public partial class Game : Node
 {
-	// TODO: change the mechanism to use real names and an order, not this name-with-number
-	public int current_level;
-	Godot.Collections.Array<BaseLevel> levels = [];
+	Godot.Collections.Array<string> level_names = ["basic", "basic_and_wildcard", "wildcard_shuffle", "tight_shuffle", "hard_wall"];
+	public int current_level_index = 0;
+	BaseLevel level = null;
 
 	// Per-level stuff
 	Godot.Collections.Array<Player> players = [];
@@ -45,57 +45,44 @@ public partial class Game : Node
 		this.states.Push(this.GenerateState());
 	}
 
-	private string GetLevelName(int level) {
-		return $"Level{level:D2}";
-	}
-
 	private void LoadLevel(int num_level) {
 		
-		string level_name = GetLevelName(num_level);
-		this.current_level = num_level;
+		string level_name = level_names[num_level];
+		this.current_level_index = num_level;
 		this.states = new Stack<State>();
 
-		foreach(BaseLevel level in this.levels) {
-			if(level.Name != level_name) {
-				level.Hide();
+		level?.QueueFree();
 
-				foreach(Node spike in level.GetChildren()) {
-					Spike s = spike as Spike;
-					if(s != null) {
-						s.Disable(true);
-					} 
-				}
-				continue;
-			}
-
-			level.Show();
-			this.arrow_index = 0;
-			this.arrows = level.arrows;
+		PackedScene requested_level_scene = GD.Load<PackedScene>($"res://levels/{level_name}.tscn");
+		level = requested_level_scene.Instantiate() as BaseLevel;
+		this.AddChild(level);
 			
-			this.players = [];
-			foreach(Node player in level.GetChildren()) {
-				Player p = player as Player;
-				if(p != null) {
-					players.Add(p);
-				}
+		this.arrow_index = 0;
+		this.arrows = level.arrows;
+			
+		this.players = [];
+		foreach(Node player in level.GetChildren()) {
+			Player p = player as Player;
+			if(p != null) {
+				players.Add(p);
 			}
-			foreach(Node spike in level.GetChildren()) {
-				Spike s = spike as Spike;
-				if(s != null) {
-					s.BodyEntered += SomethingSteppedOnSpike;
-					s.Disable(false);
-				}
+		}
+		foreach(Node spike in level.GetChildren()) {
+			Spike s = spike as Spike;
+			if(s != null) {
+				s.BodyEntered += SomethingSteppedOnSpike;
+				s.Disable(false);
 			}
-			this.walls = [];
-			foreach(Node wall in level.GetChildren()) {
-				Wall w = wall as Wall;
-				if(w != null) {
-					walls.Add(w);
-				}
+		}
+		this.walls = [];
+		foreach(Node wall in level.GetChildren()) {
+			Wall w = wall as Wall;
+			if(w != null) {
+				walls.Add(w);
 			}
 		}
 	}
-
+	
 	private bool AnyoneAlive() {
 		return players.Where(p => p.alive).Any();
 	}
@@ -158,26 +145,15 @@ public partial class Game : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-
-		for(int i=1;i<=99;++i) {
-			string level_name = GetLevelName(i);
-			BaseLevel level = this.FindChild(level_name, false) as BaseLevel;
-			if(level == null) {
-				break;
-			}
-
-			this.levels.Add(level);
-		}
-
-		this.LoadLevel(1);
+		this.LoadLevel(this.current_level_index);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _PhysicsProcess(double delta)
 	{
 
-		if(this.Won() && current_level < this.levels.Count) {
-			this.LoadLevel(current_level+1);
+		if(this.Won() && current_level_index+1 < this.level_names.Count) {
+			this.LoadLevel(current_level_index+1);
 			return;
 		}
 
