@@ -66,7 +66,7 @@ public class Arrows : IUndoable {
 			this.next_arrow_index += 1;
 		}
 		else {
-			this.next_arrow_index = this.DirMatchesArrow(dir, this.arrows[0]) ? 1 : 0;
+			this.next_arrow_index = 0;
 		}
 	}
 }
