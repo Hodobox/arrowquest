@@ -13,6 +13,7 @@ public partial class Game : Node, IUndoable
 	Godot.Collections.Array<Player> players = [];
 	// TODO: just get a grid position or something
 	Godot.Collections.Array<Wall> walls = [];
+	Godot.Collections.Array<Sprite2D> arrow_sprites = [];
 	
 	
 	private struct State{
@@ -64,6 +65,20 @@ public partial class Game : Node, IUndoable
 		this.AddChild(level);
 			
 		this.arrows = new Arrows(level.arrows);
+		while(this.arrow_sprites.Count > this.arrows.num_arrows) {
+			this.arrow_sprites[this.arrow_sprites.Count-1].QueueFree();
+			this.arrow_sprites.RemoveAt(this.arrow_sprites.Count-1);
+		}
+		while(this.arrow_sprites.Count < this.arrows.num_arrows) {
+			int sprite_index = this.arrow_sprites.Count+1;
+			Sprite2D arrow_sprite = new Sprite2D();
+			arrow_sprite.Name = $"ArrowSprite{sprite_index}";
+			// TODO: each level should have a height. Use that instead of rando constant.
+			arrow_sprite.GlobalPosition = new Vector2(sprite_index * Constants.TILE_SIZE, 300);
+
+			this.arrow_sprites.Add(arrow_sprite);
+			this.AddChild(arrow_sprite);
+		}
 			
 		this.players = [];
 		foreach(Node player in level.GetChildren()) {
@@ -99,6 +114,25 @@ public partial class Game : Node, IUndoable
 
 	private void DisplayArrows() {
 		RichTextLabel display = this.FindChild("ArrowDisplay") as RichTextLabel;
+
+		for(int i=0;i<this.arrows.num_arrows;++i) {
+			string sprite_name = this.arrows.GetArrowSprite(i);
+			string sprite_file = Arrows.GetArrowSpritePath(sprite_name);
+			Texture2D texture = GD.Load(sprite_file) as Texture2D;
+			float size = texture.GetSize().X;
+			float scale = Constants.TILE_SIZE / size;
+
+			this.arrow_sprites[i].Scale = new Vector2(scale, scale); 
+			this.arrow_sprites[i].Texture = texture;
+
+			if(i<this.arrows.next_arrow_index) {
+				this.arrow_sprites[i].Modulate = new Color(1f, 1f, 0f);
+			}
+			else {
+				this.arrow_sprites[i].Modulate = new Color(1f, 1f, 1f);
+			}
+			
+		}
 		
 		if(this.Won()) {
 			display.Text = "You Win!";
@@ -115,9 +149,8 @@ public partial class Game : Node, IUndoable
 				display.AppendText(new string([']']));
 			}
 		}
-	}
 
-	
+	}
 
 	private void SomethingSteppedOnSpike(Node2D body) {
 		Player p = body as Player;

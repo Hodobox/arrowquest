@@ -16,6 +16,34 @@ public class Arrows : IUndoable {
     public bool Completed() {
         return this.next_arrow_index == this.num_arrows;
     }
+
+    public string GetArrowSprite(int index) {
+        if(index<0 || index>=this.num_arrows) {
+            GD.PrintErr($"Requested sprite for arrow at index {index}, but arrow object only has {this.num_arrows} arrows");
+            return "error";
+        }
+
+        char arrow = this.arrows[index];
+
+        switch(arrow) {
+            case 'U':
+                return "arrow_up";
+            case 'R':
+                return "arrow_right";
+            case 'D':
+                return "arrow_down";
+            case 'L':
+                return "arrow_left";
+            case '*':
+                return "arrow_all";
+            default:
+                return "error";
+        }
+    }
+
+    public static string GetArrowSpritePath(string arrow_name) {
+        return $"res://sprites/arrows/{arrow_name}.png";
+    }
     
     private struct State {
         public int next_arrow_index;
