@@ -30,6 +30,7 @@ public enum ArrowAction
 }
 
 // TODO: this class needs cleanup. Split into multiple sections or something. Partial? Maybe?
+// and comment methods
 public class Arrows : IUndoable
 {
     public int num_arrows;
@@ -116,10 +117,35 @@ public class Arrows : IUndoable
         ));
     }
 
-    // TODO
     private static ArrowAction GetSimplestArrowActionWhichAllows(List<Direction> directions)
     {
-        return ArrowAction.ANYDIRECTION;
+        bool up = directions.Contains(Direction.UP),
+            right = directions.Contains(Direction.RIGHT),
+            down = directions.Contains(Direction.DOWN),
+            left = directions.Contains(Direction.LEFT);
+
+        // 4
+        if (up && right && down && left) return ArrowAction.ANYDIRECTION;
+        // 3
+        if (up && right && down) return ArrowAction.NOTLEFT;
+        if (up && right && left) return ArrowAction.NOTDOWN;
+        if (up && down && left) return ArrowAction.NOTRIGHT;
+        if (right && down && left) return ArrowAction.NOTUP;
+        // 2
+        if (up && right) return ArrowAction.UPRIGHT;
+        if (up && down) return ArrowAction.UPDOWN;
+        if (up && left) return ArrowAction.UPLEFT;
+        if (right && down) return ArrowAction.DOWNRIGHT;
+        if (right && left) return ArrowAction.LEFTRIGHT;
+        if (left && down) return ArrowAction.DOWNLEFT;
+        // 1
+        if (up) return ArrowAction.UP;
+        if (right) return ArrowAction.RIGHT;
+        if (down) return ArrowAction.DOWN;
+        if (left) return ArrowAction.LEFT;
+        // 0
+        GD.PrintErr("Requested arrow action which allows no directions. Returning notfoward.");
+        return ArrowAction.NOTFORWARD;
     }
 
     public bool Completed()
@@ -162,9 +188,17 @@ public class Arrows : IUndoable
     {
         if (this.last_user_action == null) return arr;
 
+        // Really? It can't tell a nullable<T> after null check is really a T?
+        Direction last_action = this.last_user_action.Value;
+
         return arr switch
         {
-            // TODO
+            ArrowAction.BACK => GetSimplestArrowActionWhichAllows([last_action.Opposite()]),
+            ArrowAction.NOTBACK => GetSimplestArrowActionWhichAllows([last_action, .. last_action.Perpendicular()]),
+            ArrowAction.FORWARD => GetSimplestArrowActionWhichAllows([last_action]),
+            ArrowAction.NOTFORWARD => GetSimplestArrowActionWhichAllows([last_action.Opposite(), .. last_action.Perpendicular()]),
+            ArrowAction.PERPENDICULAR => GetSimplestArrowActionWhichAllows(last_action.Perpendicular()),
+            ArrowAction.PARALLEL => GetSimplestArrowActionWhichAllows(last_action.Parallel()),
             _ => arr
         };
     }
@@ -227,7 +261,6 @@ public class Arrows : IUndoable
         }
     }
 
-    // TODO
     private List<Direction> AllowedDirectionsForAction(ArrowAction arr)
     {
         return this.ResolveArrowAction(arr) switch
@@ -236,6 +269,16 @@ public class Arrows : IUndoable
             ArrowAction.RIGHT => [Direction.RIGHT],
             ArrowAction.DOWN => [Direction.DOWN],
             ArrowAction.LEFT => [Direction.LEFT],
+            ArrowAction.UPDOWN => [Direction.UP, Direction.DOWN],
+            ArrowAction.LEFTRIGHT => [Direction.LEFT, Direction.RIGHT],
+            ArrowAction.UPLEFT => [Direction.UP, Direction.LEFT],
+            ArrowAction.UPRIGHT => [Direction.UP, Direction.RIGHT],
+            ArrowAction.DOWNLEFT => [Direction.DOWN, Direction.LEFT],
+            ArrowAction.DOWNRIGHT => [Direction.DOWN, Direction.RIGHT],
+            ArrowAction.NOTUP => [Direction.RIGHT, Direction.DOWN, Direction.LEFT],
+            ArrowAction.NOTRIGHT => [Direction.UP, Direction.DOWN, Direction.LEFT],
+            ArrowAction.NOTDOWN => [Direction.UP, Direction.RIGHT, Direction.LEFT],
+            ArrowAction.NOTLEFT => [Direction.UP, Direction.RIGHT, Direction.DOWN],
             ArrowAction.ANYDIRECTION => [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT],
             _ => []
         };
@@ -250,8 +293,6 @@ public class Arrows : IUndoable
     {
         if (this.next_arrow_index == this.arrows.Count) return;
 
-        this.last_user_action = dir;
-
         if (this.DirMatchesArrow(dir, this.arrows[this.next_arrow_index]))
         {
             this.next_arrow_index += 1;
@@ -260,5 +301,7 @@ public class Arrows : IUndoable
         {
             this.next_arrow_index = 0;
         }
+
+        this.last_user_action = dir;
     }
 }
