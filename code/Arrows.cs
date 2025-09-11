@@ -2,6 +2,29 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
+public enum ArrowAction {
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT,
+    UPDOWN,
+    LEFTRIGHT,
+    UPLEFT,
+    UPRIGHT,
+    DOWNLEFT,
+    DOWNRIGHT,
+    NOTUP,
+    NOTRIGHT,
+    NOTDOWN,
+    NOTLEFT,
+    BACK,
+    NOTBACK,
+    FORWARD,
+    NOTFORWARD,
+    PERPENDICULAR,
+    PARALLEL,
+    ANYDIRECTION
+}
 public class Arrows : IUndoable {
     public int num_arrows;
     public int next_arrow_index = 0;
