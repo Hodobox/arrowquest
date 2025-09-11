@@ -133,11 +133,10 @@ public partial class Game : Node, IUndoable
 
 	private void DisplayArrows()
 	{
-		RichTextLabel display = this.FindChild("ArrowDisplay") as RichTextLabel;
 
 		for (int i = 0; i < this.arrows.num_arrows; ++i)
 		{
-			string sprite_name = this.arrows.GetArrowSprite(i);
+			string sprite_name = this.arrows.GetArrowSpriteName(i);
 			string sprite_file = Arrows.GetArrowSpritePath(sprite_name);
 			Texture2D texture = GD.Load(sprite_file) as Texture2D;
 			float size = texture.GetSize().X;
@@ -159,22 +158,9 @@ public partial class Game : Node, IUndoable
 
 		if (this.Won())
 		{
+			RichTextLabel display = this.FindChild("ArrowDisplay") as RichTextLabel;
 			display.Text = "You Win!";
 			return;
-		}
-
-		display.Text = "";
-		for (int i = 0; i < this.arrows.num_arrows; ++i)
-		{
-			if (i == this.arrows.next_arrow_index)
-			{
-				display.AppendText(new string(['[']));
-			}
-			display.AppendText(new string([this.arrows.arrows[i]]));
-			if (i == this.arrows.next_arrow_index)
-			{
-				display.AppendText(new string([']']));
-			}
 		}
 
 	}
@@ -193,6 +179,9 @@ public partial class Game : Node, IUndoable
 	public override void _Ready()
 	{
 		this.LoadLevel(this.current_level_index);
+
+		RichTextLabel display = this.FindChild("ArrowDisplay") as RichTextLabel;
+		display.Text = "Arrow keys or WASD to move. Z to undo. R to restart.";
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
