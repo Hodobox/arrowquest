@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=4 uid="uid://c3rqdhmcmu5s6"]
 
-[ext_resource type="PackedScene" uid="uid://cjayent1jpbm7" path="res://levels/baseLevel.tscn" id="1_0mo0b"]
+[ext_resource type="PackedScene" uid="uid://cjayent1jpbm7" path="res://levels/Level.tscn" id="1_0mo0b"]
 
 [node name="Level04" instance=ExtResource("1_0mo0b")]
 tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAgABAAAAAAAAAAAAAgACAAAAAAAAAAAAAgADAAAAAAAAAAAAAgAEAAAAAAAAAAAAAgAAAAEAAAAAAAAAAgAAAAIAAAAAAAAAAgABAAIAAAAAAAAAAgAEAAEAAAAAAAAAAgAEAAIAAAAAAAAAAgABAAMAAAAAAAAAAgABAAQAAAAAAAAAAgACAAQAAAAAAAAAAgADAAQAAAAAAAAAAgADAAMAAAAAAAAAAgAEAAMAAAAAAAAAAgABAAEAAAAAAAAAAQA=")

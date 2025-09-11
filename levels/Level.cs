@@ -1,6 +1,6 @@
 using Godot;
 
-public partial class BaseLevel : TileMapLayer
+public partial class Level : TileMapLayer
 {
 	[Export]
 	public string arrows { get; set; }

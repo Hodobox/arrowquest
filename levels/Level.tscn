@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cjayent1jpbm7"]
+
+[ext_resource type="TileSet" uid="uid://cwp0r83guviiq" path="res://levels/Level.tres" id="1_0ydld"]
+[ext_resource type="Script" uid="uid://b5e401418s24k" path="res://levels/Level.cs" id="2_rlxyy"]
+
+[node name="Level" type="TileMapLayer"]
+tile_set = ExtResource("1_0ydld")
+script = ExtResource("2_rlxyy")
+arrows = "RR*"

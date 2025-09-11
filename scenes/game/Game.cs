@@ -6,7 +6,7 @@ public partial class Game : Node, IUndoable
 {
 	Godot.Collections.Array<string> level_names = ["basic", "basic_and_wildcard", "wildcard_shuffle", "tight_shuffle", "hard_wall"];
 	public int current_level_index = 0;
-	BaseLevel level = null;
+	Level level = null;
 
 	// Per-level stuff
 	Arrows arrows;
@@ -61,7 +61,7 @@ public partial class Game : Node, IUndoable
 		level?.QueueFree();
 
 		PackedScene requested_level_scene = GD.Load<PackedScene>($"res://levels/{level_name}.tscn");
-		level = requested_level_scene.Instantiate() as BaseLevel;
+		level = requested_level_scene.Instantiate() as Level;
 		this.AddChild(level);
 			
 		this.arrows = new Arrows(level.arrows);
