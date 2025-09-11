@@ -13,7 +13,8 @@ public partial class Spike : Area2D
 	{
 	}
 
-	public void Disable(bool yes) {
+	public void Disable(bool yes)
+	{
 		this.FindChild("CollisionShape2D").SetDeferred(CollisionShape2D.PropertyName.Disabled, yes);
 	}
 }
