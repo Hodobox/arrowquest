@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=4 uid="uid://vww4tidh3y6a"]
+
+[ext_resource type="PackedScene" uid="uid://cjayent1jpbm7" path="res://levels/Level.tscn" id="1_cxpiw"]
+
+[node name="Level" instance=ExtResource("1_cxpiw")]
+tile_map_data = PackedByteArray("AAADAAMAAAAAAAAAAQACAAIAAAAAAAAAAgAEAAIAAAAAAAAAAgAEAAQAAAAAAAAAAgACAAQAAAAAAAAAAgADAAEAAAAAAAAAAgADAAUAAAAAAAAAAgAFAAMAAAAAAAAAAgABAAMAAAAAAAAAAgA=")
+arrows = "LR;DR;UD;DL;DL;UD;DL;LR;DL;DL"
