@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://cjayent1jpbm7" path="res://levels/Level.tscn" id="1_oan6q"]
 
 [node name="Level" instance=ExtResource("1_oan6q")]
-arrows = "L;U;R;D;D;L;L"
+arrows_str = "L;U;R;D;D;L;L"
 
 [node name="Tiles" parent="." index="0"]
 tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAgAAAAEAAAAAAAAAAgAAAAIAAAAAAAAAAgAAAAMAAAAAAAAAAgABAAAAAAAAAAAAAgABAAEAAAAAAAAAAQABAAMAAAAAAAAAAgABAAQAAAAAAAAAAgACAAAAAAAAAAAAAgACAAQAAAAAAAAAAgADAAAAAAAAAAAAAgADAAQAAAAAAAAAAgAEAAAAAAAAAAAAAgAEAAEAAAAAAAAAAgAEAAIAAAAAAAAAAgAEAAMAAAAAAAAAAgAEAAQAAAAAAAAAAgA=")
