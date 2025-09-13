@@ -44,8 +44,10 @@ public partial class Level : Node, IUndoable
 	}
 
 	// Performs the in-game actions when the player makes a move
-	public void Move(Direction dir)
+	public bool Move(Direction dir)
 	{
+		if (!this.AnyoneAlive()) return false;
+
 		foreach (Player p in this.players.Where(p => p.alive))
 		{
 			Vector2 p_destination = p.WouldTryToMoveTo(dir);
@@ -55,6 +57,8 @@ public partial class Level : Node, IUndoable
 		}
 
 		this.arrows.ApplyMoveToArrows(dir);
+
+		return true;
 	}
 
 	// === IUndoable ===

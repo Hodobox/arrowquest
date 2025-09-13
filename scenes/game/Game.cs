@@ -57,7 +57,6 @@ public partial class Game : Node
 
 	private void DisplayArrows()
 	{
-
 		for (int i = 0; i < this.level.arrows.num_arrows; ++i)
 		{
 			string sprite_name = this.level.arrows.GetArrowSpriteName(i);
@@ -79,7 +78,6 @@ public partial class Game : Node
 			}
 
 		}
-
 	}
 
 	private void SomethingSteppedOnSpike(Node2D body)
@@ -137,15 +135,12 @@ public partial class Game : Node
 			return;
 		}
 
-		if (!this.level.AnyoneAlive())
+		bool moved = this.level.Move(maybe_direction.Value);
+
+		if (moved && this.level.Won)
 		{
-			return;
+			(this.FindChild("SoundLevelWon") as AudioStreamPlayer).Play();
 		}
-
-		// We are going to do something - save state
-		this.level.SaveState();
-
-		this.level.Move(maybe_direction.Value);
 	}
 
 	private Direction? GetInputDirection()
