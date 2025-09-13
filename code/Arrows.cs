@@ -148,9 +148,9 @@ public class Arrows : IUndoable
 		return ArrowAction.NOTFORWARD;
 	}
 
-	public bool Completed()
+	public bool Completed
 	{
-		return this.next_arrow_index == this.num_arrows;
+		get { return this.next_arrow_index == this.num_arrows; }
 	}
 
 	private static string GetArrowSpriteName(ArrowAction arr)

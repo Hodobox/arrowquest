@@ -13,7 +13,6 @@ public partial class Game : Node
 
 	private void LoadLevel(int num_level)
 	{
-
 		string level_name = level_names[num_level];
 		this.current_level_index = num_level;
 
@@ -56,11 +55,6 @@ public partial class Game : Node
 	}
 
 
-	public bool Won()
-	{
-		return this.level.arrows.Completed();
-	}
-
 	private void DisplayArrows()
 	{
 
@@ -84,13 +78,6 @@ public partial class Game : Node
 				this.arrow_sprites[i].Modulate = new Color(1f, 1f, 1f);
 			}
 
-		}
-
-		if (this.Won())
-		{
-			RichTextLabel display = this.FindChild("Instructions") as RichTextLabel;
-			display.Text = "You Win!";
-			return;
 		}
 
 	}
@@ -118,11 +105,18 @@ public partial class Game : Node
 	public override void _PhysicsProcess(double delta)
 	{
 
-		if (this.Won() && current_level_index + 1 < this.level_names.Count)
+		if (this.level.Won)
 		{
-			this.LoadLevel(current_level_index + 1);
-			return;
+			if (current_level_index + 1 < this.level_names.Count)
+			{
+				this.LoadLevel(current_level_index + 1);
+				return;
+			}
+
+			RichTextLabel display = this.FindChild("Instructions") as RichTextLabel;
+			display.Text = "You Win!";
 		}
+
 
 		this.DisplayArrows();
 

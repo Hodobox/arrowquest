@@ -25,6 +25,11 @@ public partial class Level : Node, IUndoable
 		get { return this.Tiles.GetUsedRect().End.X; }
 	}
 
+	public bool Won
+	{
+		get { return this.arrows.Completed; }
+	}
+
 	// === Private variables and properties ===
 	public List<Player> players;
 	private List<Wall> walls;
