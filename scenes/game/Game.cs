@@ -98,7 +98,7 @@ public partial class Game : Node, IUndoable
 		}
 
 		this.players = [];
-		foreach (Node player in level.GetChildren())
+		foreach (Node player in level.Tiles.GetChildren())
 		{
 			Player p = player as Player;
 			if (p != null)
@@ -106,7 +106,7 @@ public partial class Game : Node, IUndoable
 				players.Add(p);
 			}
 		}
-		foreach (Node spike in level.GetChildren())
+		foreach (Node spike in level.Tiles.GetChildren())
 		{
 			Spike s = spike as Spike;
 			if (s != null)
@@ -116,7 +116,7 @@ public partial class Game : Node, IUndoable
 			}
 		}
 		this.walls = [];
-		foreach (Node wall in level.GetChildren())
+		foreach (Node wall in level.Tiles.GetChildren())
 		{
 			Wall w = wall as Wall;
 			if (w != null)
