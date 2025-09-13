@@ -9,10 +9,7 @@ public partial class Game : Node
 	Level level = null;
 
 	// Per-level stuff
-	// TODO: just get a grid position or something
-	Godot.Collections.Array<Wall> walls = [];
-	Godot.Collections.Array<Sprite2D> arrow_sprites = [];
-
+	List<Sprite2D> arrow_sprites = [];
 
 	private void LoadLevel(int num_level)
 	{
@@ -54,15 +51,6 @@ public partial class Game : Node
 			{
 				s.BodyEntered += SomethingSteppedOnSpike;
 				s.Disable(false);
-			}
-		}
-		this.walls = [];
-		foreach (Node wall in level.Tiles.GetChildren())
-		{
-			Wall w = wall as Wall;
-			if (w != null)
-			{
-				walls.Add(w);
 			}
 		}
 	}
@@ -151,7 +139,6 @@ public partial class Game : Node
 
 		if (restart)
 		{
-			this.level.SaveState();
 			this.level.ApplyInitialState();
 			return;
 		}
@@ -164,16 +151,7 @@ public partial class Game : Node
 		// We are going to do something - save state
 		this.level.SaveState();
 
-		Direction direction = maybe_direction.Value;
-		foreach (Player p in this.level.players.Where(p => p.alive))
-		{
-			Vector2 p_destination = p.WouldTryToMoveTo(direction);
-			if (walls.Where(w => w.GlobalPosition == p_destination).Any()) continue;
-
-			p.Move(direction);
-		}
-
-		this.level.arrows.ApplyMoveToArrows(direction);
+		this.level.Move(maybe_direction.Value);
 	}
 
 	private Direction? GetInputDirection()

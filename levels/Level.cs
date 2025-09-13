@@ -27,6 +27,7 @@ public partial class Level : Node, IUndoable
 
 	// === Private variables and properties ===
 	public List<Player> players;
+	private List<Wall> walls;
 
 	// === Public methods ===
 
@@ -35,6 +36,20 @@ public partial class Level : Node, IUndoable
 	public bool AnyoneAlive()
 	{
 		return players.Where(p => p.alive).Any();
+	}
+
+	// Performs the in-game actions when the player makes a move
+	public void Move(Direction dir)
+	{
+		foreach (Player p in this.players.Where(p => p.alive))
+		{
+			Vector2 p_destination = p.WouldTryToMoveTo(dir);
+			if (walls.Where(w => w.GlobalPosition == p_destination).Any()) continue;
+
+			p.Move(dir);
+		}
+
+		this.arrows.ApplyMoveToArrows(dir);
 	}
 
 	// === IUndoable ===
@@ -95,12 +110,23 @@ public partial class Level : Node, IUndoable
 		this.arrows = new Arrows(this.arrows_str);
 
 		this.players = [];
-		foreach (Node player in Tiles.GetChildren())
+		this.walls = [];
+		foreach (Node tile in Tiles.GetChildren())
 		{
-			Player p = player as Player;
-			if (p != null)
 			{
-				players.Add(p);
+				Player p = tile as Player;
+				if (p != null)
+				{
+					players.Add(p);
+				}
+			}
+
+			{
+				Wall w = tile as Wall;
+				if (w != null)
+				{
+					walls.Add(w);
+				}
 			}
 		}
 	}

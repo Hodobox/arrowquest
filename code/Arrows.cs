@@ -249,6 +249,7 @@ public class Arrows : IUndoable
 	{
 		if (this.states.Any())
 		{
+			this.SaveState();
 			this.ApplyState(this.states[0]);
 		}
 	}

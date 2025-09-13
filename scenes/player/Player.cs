@@ -43,6 +43,7 @@ public partial class Player : CharacterBody2D, IUndoable
 	{
 		if (this.states.Any())
 		{
+			this.SaveState();
 			this.ApplyState(this.states[0]);
 		}
 	}
