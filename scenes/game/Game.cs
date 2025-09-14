@@ -4,11 +4,10 @@ using System.Linq;
 
 public partial class Game : Node
 {
-	Godot.Collections.Array<string> level_names = ["tutorial", "tutorial_spike", "basic_one", "basic_medium", "basic_larger", "basic_larger_wildcard", "tutorial_twodirs", "twodirs_one", "wildcard_shuffle", "tight_shuffle", "tutorial_wall", "hard_wall"];
+	Godot.Collections.Array<string> level_names = ["tutorial", "tutorial_spike", "basic_one", "basic_medium", "basic_larger", "basic_larger_wildcard", "tutorial_twodirs", "twodirs_one", "wildcard_shuffle", "tight_shuffle", "tutorial_wall", "hard_wall", "tutorial_fbp"];
 	public int current_level_index = 0;
 	Level level = null;
 
-	// Per-level stuff
 	List<Sprite2D> arrow_sprites = [];
 
 	private void LoadLevel(int num_level)
