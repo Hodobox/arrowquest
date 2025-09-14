@@ -48,6 +48,8 @@ public partial class Level : Node, IUndoable
 	{
 		if (!this.AnyoneAlive()) return false;
 
+		this.SaveState();
+
 		foreach (Player p in this.players.Where(p => p.alive))
 		{
 			Vector2 p_destination = p.WouldTryToMoveTo(dir);
