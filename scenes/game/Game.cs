@@ -2,13 +2,17 @@ using Godot;
 using System.Collections.Generic;
 using System.Linq;
 
+// TODO: rename everything to fit C# naming conventions
 public partial class Game : Node
 {
-	Godot.Collections.Array<string> level_names = ["tutorial", "tutorial_spike", "basic_one", "basic_medium", "basic_larger", "basic_larger_wildcard", "tutorial_twodirs", "twodirs_one", "wildcard_shuffle", "tight_shuffle", "tutorial_wall", "hard_wall", "tutorial_fbp"];
+	readonly List<string> level_names = ["tutorial", "tutorial_spike", "basic_one", "basic_medium", "basic_larger", "basic_larger_wildcard", "tutorial_twodirs", "twodirs_one", "wildcard_shuffle", "tight_shuffle", "tutorial_wall", "hard_wall", "tutorial_fbp", "fbp_one"];
 	public int current_level_index = 0;
 	Level level = null;
 
-	List<Sprite2D> arrow_sprites = [];
+	private Menu _menu;
+	private bool _showingMenu = false;
+
+	private List<Sprite2D> arrow_sprites = [];
 
 	private void LoadLevel(int num_level)
 	{
@@ -79,29 +83,53 @@ public partial class Game : Node
 		}
 	}
 
-	private void SomethingSteppedOnSpike(Node2D body)
+	private void ToggleMenu()
 	{
-		Player p = body as Player;
+		_showingMenu = !_showingMenu;
 
-		if (p != null)
+		if (_showingMenu)
 		{
-			p.alive = false;
+			level.SetVisible(false);
+			foreach (Sprite2D sprite in arrow_sprites)
+			{
+				sprite.Hide();
+			}
+			_menu.HoveredLevel = this.current_level_index;
+			_menu.Show();
+		}
+		else
+		{
+			level.SetVisible(true);
+			foreach (Sprite2D sprite in arrow_sprites)
+			{
+				sprite.Show();
+			}
+			_menu.Hide();
 		}
 	}
 
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+	private void HandleMenuActions()
 	{
-		this.LoadLevel(this.current_level_index);
+		Direction? maybe_direction = this.GetInputDirection();
+		bool selection_made = Input.IsActionJustPressed("menu_confirm");
+		if (maybe_direction == null && !selection_made) return;
 
-		RichTextLabel display = this.FindChild("Instructions") as RichTextLabel;
-		display.Text = "Arrow keys or WASD to move. Z to undo. R to restart.";
+		if (selection_made)
+		{
+			int level_index = _menu.HoveredLevel;
+			if (level_index != current_level_index)
+			{
+				this.LoadLevel(level_index);
+			}
+			this.ToggleMenu();
+			return;
+		}
+
+		_menu.Move(maybe_direction.Value);
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _PhysicsProcess(double delta)
+	private void HandleLevelActions()
 	{
-
 		if (this.level.Won)
 		{
 			if (current_level_index + 1 < this.level_names.Count)
@@ -113,7 +141,6 @@ public partial class Game : Node
 			RichTextLabel display = this.FindChild("Instructions") as RichTextLabel;
 			display.Text = "You Win!";
 		}
-
 
 		this.DisplayArrows();
 
@@ -139,6 +166,52 @@ public partial class Game : Node
 		if (moved && this.level.Won)
 		{
 			(this.FindChild("SoundLevelWon") as AudioStreamPlayer).Play();
+		}
+	}
+
+	private void SomethingSteppedOnSpike(Node2D body)
+	{
+		Player p = body as Player;
+
+		if (p != null)
+		{
+			p.alive = false;
+		}
+	}
+
+	// Called when the node enters the scene tree for the first time.
+	public override void _Ready()
+	{
+		_menu = this.FindChild("Menu") as Menu;
+		_menu.SetLevels(level_names);
+		_menu.Hide();
+
+		this.LoadLevel(this.current_level_index);
+
+		RichTextLabel display = this.FindChild("Instructions") as RichTextLabel;
+		display.Text = "Arrow keys or WASD to move. Z to undo. R to restart. ESC for level select.";
+	}
+
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _PhysicsProcess(double delta)
+	{
+
+		bool toggleMenu = Input.IsActionJustPressed("toggle_menu");
+
+		if (toggleMenu)
+		{
+			ToggleMenu();
+			return;
+		}
+
+		if (_showingMenu)
+		{
+			HandleMenuActions();
+			return;
+		}
+		else
+		{
+			HandleLevelActions();
 		}
 	}
 

@@ -36,7 +36,6 @@ public partial class Level : Node, IUndoable
 
 	// === Public methods ===
 
-
 	// true if any player in the level is alive
 	public bool AnyoneAlive()
 	{
@@ -61,6 +60,11 @@ public partial class Level : Node, IUndoable
 		this.arrows.ApplyMoveToArrows(dir);
 
 		return true;
+	}
+
+	public void SetVisible(bool visible)
+	{
+		this.Tiles.Visible = visible;
 	}
 
 	// === IUndoable ===
